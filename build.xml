@@ -1,0 +1,26 @@
+<project>
+	<property name="lib.dir" value="lib"/>
+	<property name="build.dir" value="build"/>
+	<property name="class.dir" value="${build.dir}/classes"/>
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
+		<pathelement path="${class.dir}"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+
+	<target name="compile">
+		<mkdir dir="${class.dir}"/>
+		<javac srcdir="src" destdir="${class.dir}" classpathref="classpath"/>
+	</target>
+
+	<target name="example" depends="compile">
+		<java fork="true" classpathref="classpath" classname="com.stromberglabs.jopensurf.SurfCompare">
+			<arg line="./example/whitehouse1.jpg ./example/whitehouse2.jpg"/>
+		</java>
+	</target>
+
+</project>

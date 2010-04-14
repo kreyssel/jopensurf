@@ -30,8 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.stromberglabs.jopensurf;
 
-import com.stromberglabs.visual.ip.InterestPoint;
-
 public class SURFInterestPoint implements Cloneable,InterestPoint {
 	private float mX,mY;
 	
@@ -134,19 +132,8 @@ public class SURFInterestPoint implements Cloneable,InterestPoint {
 	public int getDimensions() {
 		return mDescriptor.length;
 	}
-	
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
 
-	@Override
-	public String getFile() {
-		return null;
-	}
-
-	@Override
-	public long getId() {
-		return -1;
-	}
+        public Object clone() throws CloneNotSupportedException {
+                return super.clone();
+        }
 }

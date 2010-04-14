@@ -128,8 +128,8 @@ public class SurfCompare extends JPanel {
     }
     
     public static void main(String[] args) throws IOException {
-        BufferedImage imageA = ImageIO.read(new File("C:\\Users\\Andrew\\Pictures\\2010-03-09\\078.JPG"));
-        BufferedImage imageB = ImageIO.read(new File("C:\\Users\\Andrew\\Pictures\\2010-03-09\\079.JPG"));
+        BufferedImage imageA = ImageIO.read(new File(args[1]));
+        BufferedImage imageB = ImageIO.read(new File(args[2]));
 //        System.out.println(imageA);
 //        System.out.println(imageB);
         SurfCompare show = new SurfCompare(imageA,imageB);
