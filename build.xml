@@ -22,5 +22,10 @@
 			<arg line="./example/whitehouse1.jpg ./example/whitehouse2.jpg"/>
 		</java>
 	</target>
+	
+	<target name="jar" depends="compile">
+		<mkdir dir="build/jar"/>
+        <jar destfile="build/jar/jopensurf.jar" basedir="build/classes"/>
+	</target>
 
 </project>
