@@ -34,6 +34,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -41,6 +42,10 @@ import javax.swing.*;
 
 public class SurfCompare extends JPanel {
 	private static final long serialVersionUID = 1L;
+
+	private static final int BASE_CIRCLE_DIAMETER = 8;
+	private static final int TARGET_CIRCLE_DIAMETER = 4;
+	private static final int UNMATCHED_CIRCLE_DIAMETER = 4;
 	
 	private BufferedImage image;
 	private BufferedImage imageB;
@@ -55,8 +60,10 @@ public class SurfCompare extends JPanel {
 	private Surf mSurfA;
 	private Surf mSurfB;
 	
-	private java.util.List<SURFInterestPoint> mAMatchingPoints;
-	private List<SURFInterestPoint> mBMatchingPoints;
+	private Map<SURFInterestPoint,SURFInterestPoint> mAMatchingPoints;
+	private Map<SURFInterestPoint,SURFInterestPoint> mBMatchingPoints;
+
+	private boolean mUpright = false;
 	
     public SurfCompare(BufferedImage image,BufferedImage imageB){
         this.image = image;
@@ -75,8 +82,8 @@ public class SurfCompare extends JPanel {
     	mImageBWidth = (int)((float)imageB.getWidth() * mImageBXScale);
     	mImageBHeight = (int)((float)image.getHeight() * mImageBYScale);
     	
-    	mAMatchingPoints = mSurfA.getMatchingPoints(mSurfB,true);
-    	mBMatchingPoints = mSurfB.getMatchingPoints(mSurfA,true);
+    	mAMatchingPoints = mSurfA.getMatchingPoints(mSurfB,mUpright);
+    	mBMatchingPoints = mSurfB.getMatchingPoints(mSurfA,mUpright);
     }
 
     /**
@@ -90,27 +97,56 @@ public class SurfCompare extends JPanel {
         
         //if there is a surf descriptor, go ahead and draw the points
         if ( mSurfA != null && mSurfB != null ){
-        	drawIpoints(g,mSurfA.getUprightInterestPoints(),mAMatchingPoints,0,mImageAXScale,mImageAYScale);
-        	drawIpoints(g,mSurfB.getUprightInterestPoints(),mBMatchingPoints,mImageAWidth,mImageBXScale,mImageBYScale);
+        	drawIpoints(g,mUpright ? mSurfA.getUprightInterestPoints() : mSurfA.getFreeOrientedInterestPoints(),0,mImageAXScale,mImageAYScale);
+        	drawIpoints(g,mUpright ? mSurfB.getUprightInterestPoints() : mSurfB.getFreeOrientedInterestPoints(),mImageAWidth,mImageBXScale,mImageBYScale);
+		drawConnectingPoints(g);
         }
     }
     
-    private void drawIpoints(Graphics g,java.util.List<SURFInterestPoint> points,java.util.List<SURFInterestPoint> commonPoints,int offset,float xScale,float yScale){
+    private void drawIpoints(Graphics g,List<SURFInterestPoint> points,int offset,float xScale,float yScale){
     	Graphics2D g2d = (Graphics2D)g;
     	g2d.setColor(Color.RED);
     	for ( SURFInterestPoint point : points ){
+		if ( mAMatchingPoints.containsKey(point) || mBMatchingPoints.containsKey(point) ) continue;
     		int x = (int)(xScale * point.getX()) + offset;
     		int y = (int)(yScale * point.getY());
-    		g2d.drawOval(x,y,8,8);
+    		g2d.drawOval(x-UNMATCHED_CIRCLE_DIAMETER/2,y-UNMATCHED_CIRCLE_DIAMETER/2,UNMATCHED_CIRCLE_DIAMETER,UNMATCHED_CIRCLE_DIAMETER);
     	}
+    	//g2d.setColor(Color.GREEN);
+    	//for ( SURFInterestPoint point : commonPoints ){
+    	//	int x = (int)(xScale * point.getX()) + offset;
+    	//	int y = (int)(yScale * point.getY());
+    	//	g2d.drawOval(x,y,8,8);
+    	//}
+    }
+
+    private void drawConnectingPoints(Graphics g){
+    	Graphics2D g2d = (Graphics2D)g;
     	g2d.setColor(Color.GREEN);
-    	for ( SURFInterestPoint point : commonPoints ){
-    		int x = (int)(xScale * point.getX()) + offset;
-    		int y = (int)(yScale * point.getY());
-    		g2d.drawOval(x,y,8,8);
+	int offset = mImageAWidth;
+    	for ( SURFInterestPoint point : mAMatchingPoints.keySet() ){
+    		int x = (int)(mImageAXScale * point.getX());
+    		int y = (int)(mImageAYScale * point.getY());
+    		g2d.drawOval(x-BASE_CIRCLE_DIAMETER/2,y-BASE_CIRCLE_DIAMETER/2,BASE_CIRCLE_DIAMETER,BASE_CIRCLE_DIAMETER);
+		SURFInterestPoint target = mAMatchingPoints.get(point);
+		int tx = (int)(mImageBXScale * target.getX()) + offset;
+    		int ty = (int)(mImageBYScale * target.getY());
+		g2d.drawOval(tx-TARGET_CIRCLE_DIAMETER/2,ty-TARGET_CIRCLE_DIAMETER/2,TARGET_CIRCLE_DIAMETER,TARGET_CIRCLE_DIAMETER);
+		g2d.drawLine(x,y,tx,ty);
+    	}
+    	g2d.setColor(Color.BLUE);
+    	for ( SURFInterestPoint point : mBMatchingPoints.keySet() ){
+    		int x = (int)(mImageBXScale * point.getX()) + offset;
+    		int y = (int)(mImageBYScale * point.getY());
+    		g2d.drawOval(x-BASE_CIRCLE_DIAMETER/2,y-BASE_CIRCLE_DIAMETER/2,BASE_CIRCLE_DIAMETER,BASE_CIRCLE_DIAMETER);
+		SURFInterestPoint target = mBMatchingPoints.get(point);
+		int tx = (int)(mImageAXScale * target.getX());
+    		int ty = (int)(mImageAYScale * target.getY());
+		g2d.drawOval(tx-TARGET_CIRCLE_DIAMETER/2,ty-TARGET_CIRCLE_DIAMETER/2,TARGET_CIRCLE_DIAMETER,TARGET_CIRCLE_DIAMETER);
+		g2d.drawLine(x,y,tx,ty);
     	}
     }
-    
+
     public void display(){
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -121,8 +157,8 @@ public class SurfCompare extends JPanel {
     }
     
     public void matchesInfo(){
-      java.util.List<SURFInterestPoint> pointsA = mSurfA.getMatchingPoints(mSurfB,true);
-      java.util.List<SURFInterestPoint> pointsB = mSurfB.getMatchingPoints(mSurfA,true);
+      Map<SURFInterestPoint,SURFInterestPoint> pointsA = mSurfA.getMatchingPoints(mSurfB,true);
+      Map<SURFInterestPoint,SURFInterestPoint> pointsB = mSurfB.getMatchingPoints(mSurfA,true);
       System.out.println("There are: " + pointsA.size() + " matching points of " + mSurfA.getUprightInterestPoints().size());
       System.out.println("There are: " + pointsB.size() + " matching points of " + mSurfB.getUprightInterestPoints().size());
     }

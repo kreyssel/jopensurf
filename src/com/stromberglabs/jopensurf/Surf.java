@@ -34,6 +34,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
@@ -316,9 +318,9 @@ public class Surf {
 		return 0;
 	}
 	
-	public List<SURFInterestPoint> getMatchingPoints(Surf descriptor, boolean upright){
+	public Map<SURFInterestPoint,SURFInterestPoint> getMatchingPoints(Surf descriptor, boolean upright){
 		System.out.println("Finding matching points..");
-		List<SURFInterestPoint> matchingPoints = new ArrayList<SURFInterestPoint>();
+		Map<SURFInterestPoint,SURFInterestPoint> matchingPoints = new HashMap<SURFInterestPoint,SURFInterestPoint>();
 		List<SURFInterestPoint> points = upright ? getUprightInterestPoints() : getFreeOrientedInterestPoints();
 		
 		for ( SURFInterestPoint a : points ){
@@ -339,9 +341,10 @@ public class Surf {
 			}
 			
 		    // If match has a d1:d2 ratio < 0.65 ipoints are a match
-			if ( smallestDistance/nextSmallestDistance < 0.65d ){
+			//if ( smallestDistance/nextSmallestDistance < 0.65d ){
+			if ( smallestDistance/nextSmallestDistance < 0.75d ){
 				//not storing change in position
-				matchingPoints.add(possibleMatch);
+				matchingPoints.put(a,possibleMatch);
 			}
 		}
 		System.out.println("Done finding matching points");
