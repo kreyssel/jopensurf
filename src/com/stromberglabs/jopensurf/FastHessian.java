@@ -151,7 +151,7 @@ public class FastHessian {
 		for ( int rr = -1; rr <= 1; rr++ ){
 			for ( int cc = -1; cc <= 1; cc++ ){
 				if (t.getResponse(r+rr,c+cc) >= candidate ||
-						((rr != 0 && cc != 0) && m.getResponse(r+rr, c+cc, t) >= candidate) ||
+						((rr != 0 || cc != 0) && m.getResponse(r+rr, c+cc, t) >= candidate) ||
 						b.getResponse(r+rr, c+cc, t) >= candidate)
 					return false;
 			}
