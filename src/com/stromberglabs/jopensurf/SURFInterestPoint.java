@@ -39,7 +39,7 @@ public class SURFInterestPoint implements Cloneable,InterestPoint {
 	
 	private int mLaplacian;
 	
-	private double[] mDescriptor;
+	private float[] mDescriptor;
 	
 	private float mDx,mDy;
 	
@@ -76,18 +76,18 @@ public class SURFInterestPoint implements Cloneable,InterestPoint {
 		return mLaplacian;
 	}
 
-	public double[] getDescriptor() {
+	public float[] getDescriptor() {
 		return mDescriptor;
 	}
 	
 	/**
 	 * To take care of the InterestPoint Interface
 	 */
-	public double[] getLocation() {
+	public float[] getLocation() {
 		return mDescriptor;
 	}
 
-	public void setDescriptor(double[] descriptor) {
+	public void setDescriptor(float[] descriptor) {
 		mDescriptor = descriptor;
 	}
 
@@ -125,7 +125,7 @@ public class SURFInterestPoint implements Cloneable,InterestPoint {
 		return (double)Math.sqrt(sum);
 	}
 
-	public Double getCoord(int dimension) {
+	public Float getCoord(int dimension) {
 		return mDescriptor[dimension];
 	}
 

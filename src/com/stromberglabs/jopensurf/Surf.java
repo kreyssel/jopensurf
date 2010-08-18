@@ -208,7 +208,7 @@ public class Surf {
 		  int y, x, count=0;
 		  int sample_x, sample_y;
 		  double scale, dx, dy, mdx, mdy, co = 1F, si = 0F;
-		  double desc[] = new double[64];
+		  float desc[] = new float[64];
 		  double gauss_s1 = 0.0D, gauss_s2 = 0.0D, xs = 0.0D, ys = 0.0D;
 		  double rx = 0.0D, ry = 0.0D, rrx = 0.0D, rry = 0.0D, len = 0.0D;
 		  int i = 0, ix = 0, j = 0, jx = 0;
@@ -275,11 +275,13 @@ public class Surf {
 				  //Add the values to the descriptor vector
 				  gauss_s2 = gaussian(cx-2.0f,cy-2.0f,1.5f);
 				  
-				  desc[count++] = dx*gauss_s2;
-				  desc[count++] = dy*gauss_s2;
+				  //Casting from a double to a float, might be a terrible idea
+				  //but doubles are expensive
+				  desc[count++] = (float)(dx*gauss_s2);
+				  desc[count++] = (float)(dy*gauss_s2);
 				  
-				  desc[count++] = mdx*gauss_s2;
-				  desc[count++] = mdy*gauss_s2;
+				  desc[count++] = (float)(mdx*gauss_s2);
+				  desc[count++] = (float)(mdy*gauss_s2);
 				  
 				  //Accumulate length for vector normalisation
 				  len += (dx*dx + dy*dy + mdx*mdx + mdy*mdy) * (gauss_s2 * gauss_s2);
