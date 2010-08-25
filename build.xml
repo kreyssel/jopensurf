@@ -9,7 +9,8 @@
 	</path>
 
 	<target name="clean">
-		<delete dir="${build.dir}"/>
+		<delete dir="${build.dir}/classes/"/>
+		<delete file="${build.dir}/jar/jopensurf.jar"/>
 	</target>
 
 	<target name="compile">
