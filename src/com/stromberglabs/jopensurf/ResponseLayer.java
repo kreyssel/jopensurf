@@ -30,7 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.stromberglabs.jopensurf;
 
-public class ResponseLayer {
+import java.io.Serializable;
+
+public class ResponseLayer implements Serializable {
 	private int mWidth;
 	private int mHeight;
 	private int mStep;

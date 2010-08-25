@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.stromberglabs.jopensurf;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.RealMatrixImpl;
 
-public class FastHessian {
+public class FastHessian implements Serializable {
 	private static int[][] filter_map  = {{0,1,2,3}, {1,3,4,5}, {3,5,6,7}, {5,7,8,9}, {7,9,10,11}};
 	
 	private IntegralImage mIntegralImage;

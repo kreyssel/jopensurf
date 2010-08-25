@@ -30,7 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.stromberglabs.jopensurf;
 
-public class IntegralImage {
+import java.io.Serializable;
+
+public class IntegralImage implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private float[][] mIntImage;
 	private int mWidth = -1;
 	private int mHeight = -1;

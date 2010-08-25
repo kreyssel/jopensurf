@@ -30,7 +30,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.stromberglabs.jopensurf;
 
-public class SURFInterestPoint implements Cloneable,InterestPoint {
+import java.io.Serializable;
+import java.util.Arrays;
+
+public class SURFInterestPoint implements Serializable,Cloneable,InterestPoint {
+	private static final long serialVersionUID = 1L;
+
 	private float mX,mY;
 	
 	private float mScale;
@@ -133,7 +138,27 @@ public class SURFInterestPoint implements Cloneable,InterestPoint {
 		return mDescriptor.length;
 	}
 
-        public Object clone() throws CloneNotSupportedException {
-                return super.clone();
-        }
+    public Object clone() throws CloneNotSupportedException {
+            return super.clone();
+    }
+    
+    public boolean isEquivalentTo(SURFInterestPoint point){
+    	boolean isEquivalent = true;
+    	
+    	isEquivalent &= mX == point.getX();
+    	isEquivalent &= mY == point.getY();
+    	
+    	isEquivalent &= mDx == point.getDx();
+    	isEquivalent &= mDy == point.getDy();
+    	
+    	isEquivalent &= mOrientation == point.getOrientation();
+    	
+    	isEquivalent &= mScale == point.getScale();
+    	
+    	isEquivalent &= mLaplacian == point.getLaplacian();
+    	
+    	isEquivalent &= Arrays.equals(mDescriptor,point.getDescriptor());
+    	
+    	return isEquivalent;
+    }
 }

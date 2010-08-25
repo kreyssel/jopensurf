@@ -32,6 +32,12 @@ package com.stromberglabs.jopensurf;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,22 +45,24 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-
 /**
  * A class to calculate the upright or free oriented interest points of an image lazily (will not calculate until you ask for them)
  * @author astromberg
  *
  */
-public class Surf {
+public class Surf implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private static final int HESSIAN_OCTAVES = 5;
 	//private static final int HESSIAN_INTERVALS = 4;
 	private static final int HESSIAN_INIT_SAMPLE = 2;
 	private static final float HESSIAN_THRESHOLD = 0.0004F;
 	private static final float HESSIAN_BALANCE_VALUE = 0.81F;
 	
-	private BufferedImage mOriginalImage;
+	private transient BufferedImage mOriginalImage;
 	private FastHessian mHessian;
 	private List<SURFInterestPoint> mFreeOrientedPoints;
+	private List<SURFInterestPoint> mUprightPoints;
 	private List<SURFInterestPoint> mDescriptorFreeInterestPoints;
 	
 	//octaves = steps
@@ -86,17 +94,18 @@ public class Surf {
 	}
 	
 	private List<SURFInterestPoint> getPoints(boolean upright){
-		if ( mFreeOrientedPoints == null ){
-			mFreeOrientedPoints = getDescriptorFreeInterestPoints();
-			for ( SURFInterestPoint point : mFreeOrientedPoints ){
+		List<SURFInterestPoint> points = upright ? mFreeOrientedPoints : mUprightPoints;
+		if ( points == null ){
+			points = getDescriptorFreeInterestPoints();
+			for ( SURFInterestPoint point : points ){
 				getOrientation(point);
 				getMDescriptor(point,upright);
 			}
 		}
-		return mFreeOrientedPoints;
+		return points;
 	}
 	
-	public List<SURFInterestPoint> getDescriptorFreeInterestPoints(){
+	private List<SURFInterestPoint> getDescriptorFreeInterestPoints(){
 		if ( mDescriptorFreeInterestPoints == null ){
 			mDescriptorFreeInterestPoints = getHessian().getIPoints(); 
 		}
@@ -111,14 +120,14 @@ public class Surf {
 		return points;
 	}
 	
-	public FastHessian getHessian(){
+	private FastHessian getHessian(){
 		if ( mHessian == null ){
 			mHessian = new FastHessian(getIntegralImage(),mNumOctaves,HESSIAN_INIT_SAMPLE,mThreshold,mBalanceValue);
 		}
 		return mHessian;
 	}
 	
-	public IntegralImage getIntegralImage(){
+	private IntegralImage getIntegralImage(){
 		if ( mIntegralImage == null ){
 			mIntegralImage = new IntegralImage(ImageTransformUtils.generateIntegralImage(mOriginalImage));
 		}
@@ -419,13 +428,58 @@ public class Surf {
 //			e.printStackTrace();
 //		}
 //	}
+	
+	public boolean isEquivalentTo(Surf surf){
+		List<SURFInterestPoint> pointsA = surf.getFreeOrientedInterestPoints();
+		List<SURFInterestPoint> pointsB = getFreeOrientedInterestPoints();
+		if ( pointsA.size() != pointsB.size() ) return false;
+		for ( int i = 0; i < pointsA.size(); i++  ){
+			SURFInterestPoint pointA = pointsA.get(i);
+			SURFInterestPoint pointB = pointsB.get(i);
+			if ( !pointA.isEquivalentTo(pointB) ) return false;
+		}
+		return true;
+	}
+	
+	public static void saveToFile(Surf surf,String file){
+		try {
+			ObjectOutputStream stream = new ObjectOutputStream(
+					new FileOutputStream(file));
+			stream.writeObject(surf);
+			stream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static Surf readFromFile(String location){
+		File file = new File(location);
+		if (file != null && file.exists()) {
+			try {
+				ObjectInputStream str = new ObjectInputStream(
+						new FileInputStream(file));
+				return (Surf)str.readObject();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		if ( mFreeOrientedPoints == null ) getFreeOrientedInterestPoints();
+		if ( mUprightPoints == null ) getUprightInterestPoints();
+		out.defaultWriteObject();
+	}
+
 	public static void main(String args[]){
 		try {
-			BufferedImage image = ImageIO.read(new File("C:\\workspace\\opensurf\\OpenSURF\\Images\\sf.jpg"));
+			BufferedImage image = ImageIO.read(new File("H:\\workspace\\javaopensurf\\example\\lenna.png"));
 			Surf board = new Surf(image);
-			List<SURFInterestPoint> points = board.getFreeOrientedInterestPoints();
+			saveToFile(board,"C:\\surf_test.bin");
+			Surf boarder = readFromFile("C:\\surf_test.bin");
+			List<SURFInterestPoint> points = boarder.getFreeOrientedInterestPoints();
 			System.out.println("Found " + points.size() + " interest points");
-			
 		} catch (Exception e){
 			e.printStackTrace();
 		}
