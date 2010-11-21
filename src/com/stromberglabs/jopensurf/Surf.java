@@ -74,7 +74,7 @@ public class Surf implements Serializable {
 	private IntegralImage mIntegralImage;
 	
 	public Surf(BufferedImage image){
-		mOriginalImage = image;
+		this(image,HESSIAN_BALANCE_VALUE,HESSIAN_THRESHOLD,HESSIAN_OCTAVES);
 	}
 	
 	public Surf(BufferedImage image, float balanceValue, float threshold, int octaves){
@@ -82,7 +82,15 @@ public class Surf implements Serializable {
 		mNumOctaves = octaves;
 		mBalanceValue = balanceValue;
 		mThreshold = threshold;
-		//mNumIntervals
+		
+		//Calculate the integral image
+		mIntegralImage = new IntegralImage(mOriginalImage);
+		
+		//Calculate the fast hessian
+		mHessian = new FastHessian(mIntegralImage,mNumOctaves,HESSIAN_INIT_SAMPLE,mThreshold,mBalanceValue);
+		
+		//Calculate the descriptor and orientation free interest points
+		mDescriptorFreeInterestPoints = mHessian.getIPoints();
 	}
 	
 	public List<SURFInterestPoint> getUprightInterestPoints(){
@@ -106,9 +114,6 @@ public class Surf implements Serializable {
 	}
 	
 	private List<SURFInterestPoint> getDescriptorFreeInterestPoints(){
-		if ( mDescriptorFreeInterestPoints == null ){
-			mDescriptorFreeInterestPoints = getHessian().getIPoints(); 
-		}
 		List<SURFInterestPoint> points = new ArrayList<SURFInterestPoint>(mDescriptorFreeInterestPoints.size());
 		for ( SURFInterestPoint point : mDescriptorFreeInterestPoints ){
 			try {
@@ -120,24 +125,8 @@ public class Surf implements Serializable {
 		return points;
 	}
 	
-	private FastHessian getHessian(){
-		if ( mHessian == null ){
-			mHessian = new FastHessian(getIntegralImage(),mNumOctaves,HESSIAN_INIT_SAMPLE,mThreshold,mBalanceValue);
-		}
-		return mHessian;
-	}
-	
-	private IntegralImage getIntegralImage(){
-		if ( mIntegralImage == null ){
-			mIntegralImage = new IntegralImage(ImageTransformUtils.generateIntegralImage(mOriginalImage));
-		}
-		return mIntegralImage;
-	}
-	
 	//TODO: Why the multiply by 1?
 	private float haarX(int row, int column, int s){
-		//System.out.println("row = " + row + ", column = " + column + ", s = " + s); 
-		//System.out.println(ImageTransformUtils.BoxIntegral(mIntegralImage, row-s/2, column, s, s/2) + "," + ImageTransformUtils.BoxIntegral(mIntegralImage, row-s/2, column-s/2, s, s/2));
 		return ImageTransformUtils.BoxIntegral(mIntegralImage, row-s/2, column, s, s/2)
 			-1 * ImageTransformUtils.BoxIntegral(mIntegralImage, row-s/2, column-s/2, s, s/2);
 	}

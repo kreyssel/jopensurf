@@ -49,7 +49,7 @@ public class SURFInterestPoint implements Serializable,Cloneable,InterestPoint {
 	private float mDx,mDy;
 	
 	private int mClusterIndex;
-
+	
 	public SURFInterestPoint(float x, float y, float scale, int laplacian){
 		mX = x;
 		mY = y;

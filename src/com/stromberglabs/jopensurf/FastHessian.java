@@ -37,10 +37,14 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.math.linear.Array2DRowRealMatrix;
+import org.apache.commons.math.linear.DecompositionSolver;
+import org.apache.commons.math.linear.LUDecompositionImpl;
 import org.apache.commons.math.linear.RealMatrix;
-import org.apache.commons.math.linear.RealMatrixImpl;
 
 public class FastHessian implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private static int[][] filter_map  = {{0,1,2,3}, {1,3,4,5}, {3,5,6,7}, {5,7,8,9}, {7,9,10,11}};
 	
 	private IntegralImage mIntegralImage;
@@ -188,7 +192,8 @@ public class FastHessian implements Serializable {
 		RealMatrix partialDerivs = getPartialDerivativeMatrix(r,c,t,m,b);
 		RealMatrix hessian3D = getHessian3DMatrix(r,c,t,m,b);
 		
-		RealMatrix X = hessian3D.inverse().multiply(partialDerivs);
+		DecompositionSolver solver = new LUDecompositionImpl(hessian3D).getSolver();
+		RealMatrix X = solver.getInverse().multiply(partialDerivs);
 		
 //		System.out.println("X = " + X.getColumnDimension() + " col x " + X.getRowDimension() + " rows");
 //		for ( int i = 0; i < X.getRowDimension(); i++ ){
@@ -221,11 +226,11 @@ public class FastHessian implements Serializable {
 		//System.out.format("dx = %.8f, dy = %.8f, ds = %.8f",derivs[0][0],derivs[1][0],derivs[2][0]);
 		//System.out.println();
 		
-		RealMatrix matrix = new RealMatrixImpl(derivs);
+		RealMatrix matrix = new Array2DRowRealMatrix(derivs);
 		//System.out.println("Matrix Num Rows: " + matrix.getRowDimension() + ", num columns: " + matrix.getColumnDimension());
 		return matrix;
 	}
-	
+
 	private RealMatrix getHessian3DMatrix(int r, int c, ResponseLayer t, ResponseLayer m, ResponseLayer b){
 		//Layout:
 		//  [dxx][dxy][dxs]
@@ -268,12 +273,12 @@ public class FastHessian implements Serializable {
 											b.getResponse(r + 1, c, t) + 
 											b.getResponse(r - 1, c, t) ) / 4.0;
 
-		return new RealMatrixImpl(hessian);
+		return new Array2DRowRealMatrix(hessian);
 	}
 	
 	public static void main(String[] args){
 		try {
-			IntegralImage integralImage = new IntegralImage(ImageTransformUtils.generateIntegralImage(ImageIO.read(new File("C:\\workspace\\opensurf\\OpenSURF\\Images\\sf.jpg"))));
+			IntegralImage integralImage = new IntegralImage(ImageIO.read(new File("C:\\workspace\\opensurf\\OpenSURF\\Images\\sf.jpg")));
 			FastHessian hessian = new FastHessian(integralImage,5,2,0.004F,0.81F);
 			hessian.getIPoints();
 		} catch (Exception e){

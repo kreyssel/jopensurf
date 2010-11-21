@@ -33,6 +33,8 @@ package com.stromberglabs.jopensurf;
 import java.io.Serializable;
 
 public class ResponseLayer implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	private int mWidth;
 	private int mHeight;
 	private int mStep;
