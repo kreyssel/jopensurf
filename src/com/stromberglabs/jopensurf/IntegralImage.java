@@ -93,7 +93,7 @@ public class IntegralImage implements Serializable {
 		int height = input.getHeight();
 		
 		WritableRaster raster = input.getRaster();
-		int[] pixel = new int[3];
+		int[] pixel = new int[4];
 		float sum;
 		for ( int y = 0; y < height; y++ ){
 			sum = 0F;
