@@ -206,11 +206,11 @@ public class FastHessian implements Serializable {
 //		
 		//values of them are used
 		//xi
-		values[0] = X.getEntry(2,0);
+		values[0] = -X.getEntry(2,0);
 		//xr
-		values[1] = X.getEntry(1,0);
+		values[1] = -X.getEntry(1,0);
 		//xc
-		values[2] = X.getEntry(0,0);
+		values[2] = -X.getEntry(0,0);
 		
 		return values;
 	}
