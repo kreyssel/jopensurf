@@ -105,6 +105,12 @@ public class Surf implements Serializable {
 		List<SURFInterestPoint> points = upright ? mUprightPoints : mFreeOrientedPoints;
 		if ( points == null ){
 			points = getDescriptorFreeInterestPoints();
+			// cache for next time through
+			if (upright) {
+				mUprightPoints = points;
+			} else {
+				mFreeOrientedPoints = points;
+			}
 			for ( SURFInterestPoint point : points ){
 				getOrientation(point);
 				getMDescriptor(point,upright);
