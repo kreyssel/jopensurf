@@ -174,7 +174,7 @@ public class FastHessian implements Serializable {
 		xr = values[1];
 		xc = values[2];
 		
-		if ( Math.abs(xi) < 0.5f & Math.abs(xr) < 0.5f && Math.abs(xc) < 0.5f ){
+		if ( Math.abs(xi) < 0.5f && Math.abs(xr) < 0.5f && Math.abs(xc) < 0.5f ){
 			//WE"VE GOT AN INTEREST POINT HERE
 			float x = (float)(c+xc)*t.getStep();
 			float y = (float)(r+xr)*t.getStep();
