@@ -53,5 +53,16 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	
+	<distributionManagement>
+		<repository>
+			<id>buildhive-release</id>
+			<url>https://repository-kreyssel-ae.forge.cloudbees.com/release/</url>
+		</repository>
+		<snapshotRepository>
+			<id>buildhive-snapshot</id>
+			<url>https://repository-kreyssel-ae.forge.cloudbees.com/snapshot/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 </project>
