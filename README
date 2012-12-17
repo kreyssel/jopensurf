@@ -1,3 +1,5 @@
+[![Build Status](https://buildhive.cloudbees.com/job/kreyssel/job/jopensurf/badge/icon)](https://buildhive.cloudbees.com/job/kreyssel/job/jopensurf/)
+
 This is a pretty small set of code, folks were having trouble getting it to work correctly (to be fair I forgot a couple of files ;)) so I included an ant buildfile. It's really only got three commands:
 
 ant compile - This will compile the files
