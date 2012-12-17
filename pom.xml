@@ -5,7 +5,7 @@
 
 	<groupId>com.google.code.jopensurf</groupId>
 	<artifactId>jopensurf</artifactId>
-	<version>0.0.1-r25-SNAPSHOT</version>
+	<version>0.0.1-r25</version>
 	<packaging>jar</packaging>
 
 	<name>jOpenSurf</name>
@@ -56,11 +56,11 @@
 	
 	<distributionManagement>
 		<repository>
-			<id>cloudbees-forge-release</id>
+			<id>cloudbees-private-repository</id>
 			<url>https://repository-kreyssel-ae.forge.cloudbees.com/release/</url>
 		</repository>
 		<snapshotRepository>
-			<id>cloudbees-forge-snapshot</id>
+			<id>cloudbees-private-repository</id>
 			<url>https://repository-kreyssel-ae.forge.cloudbees.com/snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
